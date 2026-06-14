@@ -35,9 +35,9 @@ pnpm install
 
 **Backend** (`apps/backend/.env`):
 ```env
-# Add your model provider API keys
-GOOGLE_GENERATIVE_AI_API_KEY=your_key_here
-# or OPENAI_API_KEY, ANTHROPIC_API_KEY, etc.
+# Add your model provider API keys dan UI URL
+UI_URL= your_ui_url
+AI_GATEWAY_API_KEY= your_api_key
 ```
 
 **Frontend** (`apps/web/.env`):

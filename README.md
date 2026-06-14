@@ -1,135 +1,137 @@
-# Turborepo starter
+# Vercel AI SDK + NestJS + Next.js
 
-This Turborepo starter is maintained by the Turborepo core team.
+A monorepo showcasing AI-powered chat with tool calling using Vercel AI SDK, NestJS backend, and Next.js frontend.
 
-## Using this example
+## Architecture
 
-Run the following command:
+- **Backend** (`apps/backend`): NestJS API with streaming chat endpoint and weather tool
+- **Frontend** (`apps/web`): Next.js 16 app with AI SDK React for chat UI
+- **Shared** (`packages/ui`): Shared React components (WeatherCard)
+- **Config** (`packages/*`): Shared ESLint, TypeScript configs
 
-```sh
-npx create-turbo@latest
+## Features
+
+- **Streaming Chat**: Real-time AI responses via Vercel AI SDK
+- **Model Selection**: Choose any compatible model (default: `google/gemini-2.5-flash-lite`)
+- **Tool Calling**: AI can call `getWeather` tool to fetch weather data
+- **Weather Display**: Rich weather cards rendered in chat
+- **Type-Safe**: Full TypeScript across monorepo
+
+## Prerequisites
+
+- Node.js 18+
+- pnpm 9+
+- API key for your chosen model provider (e.g., Google AI Studio for Gemini)
+
+## Getting Started
+
+### 1. Install Dependencies
+
+```bash
+pnpm install
 ```
 
-## What's inside?
+### 2. Configure Environment
 
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+**Backend** (`apps/backend/.env`):
+```env
+# Add your model provider API keys
+GOOGLE_GENERATIVE_AI_API_KEY=your_key_here
+# or OPENAI_API_KEY, ANTHROPIC_API_KEY, etc.
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+**Frontend** (`apps/web/.env`):
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
-### Develop
+### 3. Run Development
 
-To develop all apps and packages, run the following command:
+```bash
+# Start all apps (backend on :3001, frontend on :3000)
+pnpm dev
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+# Or individually:
+pnpm --filter=backend dev
+pnpm --filter=web dev
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+### 4. Open Application
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+## Usage
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+1. **Select Model**: Enter any Vercel AI SDK compatible model ID (e.g., `google/gemini-2.5-flash-lite`, `openai/gpt-4o`, `anthropic/claude-3-5-sonnet`)
+2. **Chat**: Type messages - the AI responds in real-time
+3. **Weather Queries**: Ask "What's the weather in Tokyo?" - AI calls the weather tool and displays a weather card
 
-### Remote Caching
+## API Endpoint
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+**POST** `/chat`
+```json
+{
+  "messages": [{ "id": "1", "role": "user", "parts": [{ "type": "text", "text": "Hi" }] }],
+  "model": "google/gemini-2.5-flash-lite"
+}
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+Returns: Streaming UI Message format (text + tool results)
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+## Available Tools
+
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `getWeather` | Get current weather for a location | `location: string` |
+
+## Commands
+
+```bash
+# Build all
+pnpm build
+
+# Lint all
+pnpm lint
+
+# Format code
+pnpm format
+
+# Type check
+pnpm check-types
+```
+
+## Project Structure
 
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+├── apps/
+│   ├── backend/          # NestJS API
+│   │   └── src/
+│   │       └── chat/     # Chat module (controller, service, tools)
+│   └── web/              # Next.js frontend
+│       ├── app/          # App router pages
+│       └── components/   # WeatherCard
+└── packages/
+    ├── ui/               # Shared React components
+    ├── eslint-config/    # Shared ESLint config
+    └── typescript-config/# Shared TS configs
 ```
 
-## Useful Links
+## Extending Tools
 
-Learn more about the power of Turborepo:
+Add new tools in `apps/backend/src/chat/tools.service.ts`:
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+```typescript
+getNewTool() {
+  return tool({
+    description: 'Tool description',
+    inputSchema: z.object({ param: z.string() }),
+    execute: async ({ param }) => { /* implementation */ },
+  });
+}
+
+getAllTools() {
+  return {
+    getWeather: this.getWeatherTool(),
+    newTool: this.getNewTool(),
+  };
+}
+```
+
